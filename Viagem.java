@@ -47,52 +47,48 @@ public class Viagem {
 		cidades.add(destino);
 		entregas.put(destino, new ArrayList<Vagao>());
 	}
-	
 	/**
-	 * Adiciona uma carga do tipo granéis a ser transportada na viagem.
-	 * @param quantidade Quantidade de carga
-	 * @param destino Cidade de destino da carga
-	 * @return True se foi possível carregar a carga, false caso contrário.
+	 * Adiciona uma garga de graneis à viagem
+	 * @param quantidade
+	 * @param destino
+	 * @throws TremException
 	 */
-	public boolean adicaoCargaGraneis (int quantidade, String destino) {
+	public void adicaoCargaGraneis (int quantidade, String destino) throws TremException{
 		Vagao[] vagoes = composicao.carregarGraneis(quantidade);
 		if (vagoes == null)
-			return false;
+			throw new TremException("Impossivel carregar graneis", TremException.CARREGAMENTO_INVALIDO);
 		for (Vagao vagao : vagoes) {
 			entregas.get(destino).add(vagao);
 		}
-		return true;
 	}
 	
 	/**
-	 * Adiciona uma carga líquida a ser transportada na viagem.
-	 * @param quantidade Quantidade de carga
-	 * @param conteudo Cidade de destino da carga
-	 * @param destino Cidade destino desta carga
-	 * @return True se foi possível carregar a carga, false caso contrário.
+	 * Adiciona uma carga liquida na viagem
+	 * @param quantidade
+	 * @param conteudo
+	 * @param destino
+	 * @throws TremException
 	 */
-	public boolean adicaoCargaLiquida (int quantidade, ConteudoLiquido conteudo,
-			String destino) {
+	public void adicaoCargaLiquida (int quantidade, ConteudoLiquido conteudo,
+			String destino) throws TremException {
 		Vagao[] vagoes = composicao.carregarLiquido(quantidade, conteudo);
 		if (vagoes == null)
-			return false;
+			throw new TremException("Impossivel carregar liquido", TremException.CARREGAMENTO_INVALIDO);
 		for (Vagao vagao : vagoes) {
 			entregas.get(destino).add(vagao);
 		}
-		return true;
 	}
 	
 	/**
-	 * Inicia viagem colocando locomotiva na primeira cidade. Só permite iniciar viagem
-	 * se a composição for válida.
-	 * @return True se viagem iniciou, false caso contrário.
+	 * Inicia a viagem caso a composicao seja valida
+	 * @throws TremException
 	 */
-	public boolean iniciaViagem() {
+	public void iniciaViagem() throws TremException{
 		if (composicao.valida()) {
 			cidadeAtual = 0;
-			return true;
+		} else {
+			throw new TremException("Impossivel iniciar viagem - composicao invalida", TremException.COMPOSICAO_INVALIDA);
 		}
-		return false;
 	}
 	
 	/**

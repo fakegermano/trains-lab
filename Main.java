@@ -20,7 +20,6 @@ public class Main {
 		HashMap<String, Composicao> composicoes = new HashMap<String, Composicao>();
 		HashMap<String, Viagem> viagens = new HashMap<String, Viagem>();
 		
-		@SuppressWarnings("resource")
 		Scanner entrada = new Scanner(System.in);
 		String comando;
 		
@@ -62,8 +61,11 @@ public class Main {
 					}
 
 					carros.put(codigo, new VagaoLiquidos(codigo, capacidade, conteudos));
+				} else if (tipo.equals("vagaop")) { // vagão plataforma
+					int capacidade = entrada.nextInt();
+					String tipoCarga = entrada.next();
+					carros.put(codigo, new VagaoPlataforma(codigo, capacidade, tipoCarga));
 				}
-				
 			} else if (comando.equals("cadd")) { // adiciona carro na composição
 				String codigoComposicao = entrada.next();
 				String codigoCarro = entrada.next();
@@ -106,10 +108,17 @@ public class Main {
 			} else if (comando.equals("vinit")) { // inicia viagem
 				String codigoComposicao = entrada.next();
 				Viagem viagem = viagens.get(codigoComposicao);
-				if (viagem.iniciaViagem())
+				
+				try {
+					viagem.iniciaViagem();
 					System.out.println("Viagem da composicao " + codigoComposicao + " iniciada");
-				else
-					System.out.println("Viagem da composicao " + codigoComposicao + " invalida");
+				} catch (TremException e) {
+					if (e.getTipo() == TremException.COMPOSICAO_INVALIDA) {
+						System.out.println("Viagem da composicao " + codigoComposicao + " invalida");
+						System.out.println(e.getMessage());
+					} else
+						e.printStackTrace();
+				}
 			} else if (comando.equals("vavanca")) { // avança cidade na viagem
 				String codigoComposicao = entrada.next();
 				Viagem viagem = viagens.get(codigoComposicao);
@@ -123,8 +132,16 @@ public class Main {
 				int quantidade = entrada.nextInt();
 				Viagem viagem = viagens.get(codigoComposicao);
 				
-				if (!viagem.adicaoCargaGraneis(quantidade, cidade))
-					System.out.println("Quantidade nao pode ser adicionada");
+				try {
+					viagem.adicaoCargaGraneis(quantidade, cidade);
+					System.out.println("Carga de graneis carregado na composicao " + codigoComposicao);
+				} catch (TremException e) {
+					if (e.getTipo() == TremException.CARREGAMENTO_INVALIDO) {
+						System.out.println("Quantidade de graneis nao pode ser adicionada");
+						System.out.println(e.getMessage());
+					} else
+						e.printStackTrace();
+				}
 			} else if (comando.equals("vaddcargal")) { // adiciona carga de líquida
 				String codigoComposicao = entrada.next();
 				String cidade = entrada.next();
@@ -140,11 +157,31 @@ public class Main {
 				else if (conteudo.equals("AL"))
 					tipoConteudo = ConteudoLiquido.ALCOOL;
 
-				if (!viagem.adicaoCargaLiquida(quantidade, tipoConteudo, cidade))
-					System.out.println("Quantidade nao pode ser adicionada");
+				try {
+					viagem.adicaoCargaLiquida(quantidade, tipoConteudo, cidade);
+					System.out.println("Carga de liquidos carregado na composicao " + codigoComposicao);
+				} catch (TremException e) {
+					if (e.getTipo() == TremException.CARREGAMENTO_INVALIDO) {
+						System.out.println("Quantidade de liquidos nao pode ser adicionada");
+						System.out.println(e.getMessage());
+					} else
+						e.printStackTrace();
+				}
+			} else if (comando.equals("carregarP")) {
+				String codigoVagao = entrada.next();
+				int quantidade = entrada.nextInt();
+				
+				Carro carro = carros.get(codigoVagao);
+				if (carro instanceof VagaoPlataforma) {
+					VagaoPlataforma vagao = (VagaoPlataforma)carro;
+					vagao.carregarCarga(quantidade);
+				}
+					
 			}
 			
 		} while (!comando.equals("sair"));
+		
+		entrada.close();
 	}
 
 }
