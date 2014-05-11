@@ -1,4 +1,5 @@
 
+
 /**
  * Representa um item que pode ser carregado com uma carga
  */

@@ -1,4 +1,5 @@
 
+
 import java.util.ArrayList;
 
 /**
@@ -126,5 +127,22 @@ public class VagaoLiquidos extends Vagao {
 			}
 		}
 		return false;
+	}
+	@Override
+	public int compareTo(Carro o) {
+	    final int BEFORE = -1;
+	    final int AFTER = 1;
+	    
+	    if (o instanceof Locomotiva || o instanceof VagaoGraneleiro) return AFTER;
+	    else if (o instanceof VagaoLiquidos) 
+	    	return this.getCodigo().compareTo(o.getCodigo());
+	    else return BEFORE;
+	}
+	/**
+	 * get padrao para o tipo de conteudo sendo usado atualmente
+	 * @return
+	 */
+	public ConteudoLiquido getConteudoUsado() {
+		return this.conteudo;
 	}
 }

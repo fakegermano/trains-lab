@@ -1,10 +1,11 @@
 
+
 /**
  * Classe abstrata que representa um carro (vagão ou locomotiva)
  * ferroviário.
  *
  */
-public abstract class Carro {
+public abstract class Carro implements Comparable<Carro>{
 
 	/**
 	 * Código do carro

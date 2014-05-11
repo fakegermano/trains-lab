@@ -1,4 +1,5 @@
 
+
 /**
  * Classe que representa um vagão para carregar granéis.
  */
@@ -54,6 +55,17 @@ public class VagaoGraneleiro extends Vagao {
 	@Override
 	public int quantidadeCarregada() {
 		return this.cargaAtual;
+	}
+	
+	@Override
+	public int compareTo(Carro o) {
+		final int BEFORE = -1;
+		final int AFTER = 1;
+		
+		if (o instanceof Locomotiva) return AFTER;
+		else if (o instanceof VagaoGraneleiro) 
+		    return this.getCodigo().compareTo(o.getCodigo());
+		else return BEFORE;
 	}
 
 }

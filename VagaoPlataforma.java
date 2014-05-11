@@ -1,5 +1,6 @@
 
 
+
 public class VagaoPlataforma extends Vagao {
 	
 	private int capacidade;
@@ -55,6 +56,15 @@ public class VagaoPlataforma extends Vagao {
 				this.getCapacidade() + "|" + 
 				this.quantidadeCarregada() + "|" + 
 				this.getTipoCarga();
+	}
+
+	@Override
+	public int compareTo(Carro o) {
+	    final int AFTER = 1;
+	    
+	    if (o instanceof VagaoPlataforma) 
+		return this.getCodigo().compareTo(o.getCodigo());
+	    else return AFTER;
 	}
 
 }

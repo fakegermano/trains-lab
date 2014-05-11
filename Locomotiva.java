@@ -1,4 +1,5 @@
 
+
 /**
  * Classe que representa um carro do tipo locomotiva.
  */
@@ -36,6 +37,15 @@ public class Locomotiva extends Carro {
 				return getCodigo() + "|" + "V";
 		}
 		return getCodigo() + "|" + "D";
+	}
+
+	@Override
+	public int compareTo(Carro o) {
+	    final int BEFORE = -1;
+	    
+	    if (o instanceof Locomotiva) 
+		return this.getCodigo().compareTo(o.getCodigo());
+	    else return BEFORE;
 	}
 	
 

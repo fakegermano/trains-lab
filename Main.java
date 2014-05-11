@@ -177,6 +177,9 @@ public class Main {
 					vagao.carregarCarga(quantidade);
 				}
 					
+			} else if (comando.equals("ordena")) {
+				String codigoComposicao = entrada.next();
+				composicoes.get(codigoComposicao).ordenaPorCarga();
 			}
 			
 		} while (!comando.equals("sair"));
