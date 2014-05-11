@@ -3,7 +3,7 @@
  * Classe abstrata que representa um vagão
  *
  */
-public abstract class Vagao extends Carro {
+public abstract class Vagao extends Carro implements Carregavel {
 
 	/**
 	 * Construtor da classe.

@@ -18,92 +18,93 @@ public class Composicao {
 	 * Variável usada para armazenar o código
 	 */
 	private String codigo;
-	
 	/**
-	 * Construtor que inicializa as variaveis internas
+	 * Construtor que inicializa as variaveis internas da classe e da superclasse
 	 * @param codigo
 	 */
 	public Composicao(String codigo) {
 		this.codigo = codigo;
 		this.carros = new ArrayList<Carro>();
 	}
-	
 	/**
-	 * Retorna o tamanho da composição
-	 * @return int numero de carros na composição
+	 * Retorna o tamanho da composicao (numero de carros )
+	 * @return
 	 */
 	public int tamanhoComposicao() {
-		return carros.size();
+		return this.carros.size();
 	}
 	/**
-	 * Retorna o carro na posição indicada no parametro
+	 * retorna o carro da posicao indicada
 	 * @param carro
-	 * @return Carro carro que estava no indice
+	 * @return
 	 */
 	public Carro getCarro(int carro) {
-		return carros.get(carro);
+		return this.carros.get(carro);
 	}
+	
 	/**
-	 * Adiciona o carro passado em parametro na composição atual
+	 * adiciona um carro na composicao, se for uma locomotiva adiciona no começo
 	 * @param carro
 	 */
 	public void adicionaCarro(Carro carro) {
-		if (carro.getClass().equals(Locomotiva.class)) {
-			carros.add(0, carro);
+		if (carro instanceof Locomotiva) {
+			this.carros.add(0, carro);
 		} else {
-			carros.add(carro);
+			this.carros.add(carro);
 		}
 	}
 	
 	/**
-	 * Avalia se a composição é válida, ou seja, possui pelo menos uma locomotiva
-	 * @return boolean true se o primeiro carro eh locomotiva
+	 * retorna se a composicao eh valida, ou seja, se possui uma locomotiva
+	 * @return
 	 */
 	public boolean valida () {
-		if (carros.size() == 0) 
-			return false;
-		if (carros.get(0).getClass().equals(Locomotiva.class)) {
-			return true;
-		} else {
+		if (this.carros.size() == 0) {
 			return false;
 		}
+		if (this.getCarro(0) instanceof Locomotiva) {
+			return true;
+		}
+		return false;
 	}
 	/**
-	 * Retorna a soma das capacidades dos vagoes de liquidos na composição
-	 * @return double soma das capacidades dos vagoes de liquidos
+	 * retorna a soma da capacidade de todos os vagoes de liquidos
+	 * @return
 	 */
 	public double capacidadeTotalLiquidos() {
-		double soma=0;
-		for (Carro vagao : carros) {
-			if (vagao.getClass().equals(VagaoLiquidos.class)) {
-				soma += ((VagaoLiquidos)vagao).getCapacidade();
+		int capacidade = 0;
+		for (Carro carro : this.carros) {
+			if (carro instanceof VagaoLiquidos) {
+				capacidade += ((Vagao)carro).getCapacidade();
 			}
 		}
-		return soma;
+		return capacidade;
 	}
+	
 	/**
-	 * Retorna a soma das capacidades dos vagoes graneleiros na composição
-	 * @return double soma das capacidades dos vagoes graneleiros
+	 * retorna a soma da capacidade de todos os vagoes graneleiros
+	 * @return
 	 */
 	public double capacidadeTotalGraneis() {
-		double soma=0;
-		for (Carro vagao : carros) {
-			if (vagao.getClass().equals(VagaoGraneleiro.class)) {
-				soma += ((VagaoGraneleiro)vagao).getCapacidade();
+		int capacidade = 0;
+		for (Carro carro : this.carros) {
+			if (carro instanceof VagaoGraneleiro) {
+				capacidade += ((Vagao)carro).getCapacidade();
 			}
 		}
-		return soma;
+		return capacidade;
 	}
+	
 	/**
-	 * Retorna se a composição atual é imflamavel, ou seja, possui pelo menos um
-	 * vagao de liquidos com liquidos inflamaveis
-	 * @return boolean true para composicao inflamavel
+	 * retorna se a composicao esta no estado inflamavel (esta carregando um produto inflamavel)
+	 * @return
 	 */
 	public boolean inflamavel () {
-		for (Carro vagao : carros) {
-			if (vagao.getClass().equals(VagaoLiquidos.class)) {
-				if (((VagaoLiquidos)vagao).inflamavel() == true)
+		for (Carro carro : this.carros) {
+			if (carro instanceof VagaoLiquidos) {
+				if (((VagaoLiquidos) carro).inflamavel()) {
 					return true;
+				}
 			}
 		}
 		return false;
@@ -119,5 +120,177 @@ public class Composicao {
 			retorno = retorno + carro.getCodigo() + "|"; 
 		}
 		return retorno;
+	}
+
+	/**
+	 * A funcao carregaGraneis tenta carregar uma certa quantidade de graneis em um dos vagoes da
+	 * composicao se falhar ela tenta distribuir na composicao, se nao houver capacidade a funcao nao carrega
+	 * os vagoes
+	 * @param quantidade
+	 * @return Vagao[] vetor de vagoes que sofreram o carregamento
+	 */
+	public Vagao[] carregarGraneis(int quantidade) {
+		ArrayList<VagaoGraneleiro> vagoes = new ArrayList<VagaoGraneleiro>();
+		
+		/*
+		 *  Tenta colocar em apenas um vagao
+		 */
+		for (Carro carro : this.carros) {
+			if (carro instanceof VagaoGraneleiro) {
+				if (((VagaoGraneleiro) carro).carregarCarga(quantidade)) {
+					vagoes.add((VagaoGraneleiro)carro);
+					break;
+				}
+			}
+		}
+		
+		/*
+		 * conta a capacidade total (soma) dos vagoes vazios
+		 */
+		int capacidadeVazios = 0;
+		for (Carro carro : this.carros) {
+			if (carro instanceof VagaoGraneleiro) {
+				if (!((VagaoGraneleiro) carro).carregado()) {
+					capacidadeVazios += ((VagaoGraneleiro) carro).getCapacidade();
+				}
+			}
+		}
+		
+		/*
+		 * caso nao conseguiu colocar em apenas um, tenta distribuir na composição
+		 */
+		if (vagoes.isEmpty()) {
+			int debito = -quantidade;
+			int i=0;
+			if (capacidadeVazios >= quantidade) {
+				/*
+				 * distribui a quantidade seguidamente na composicao
+				 */
+				while (debito < 0) {
+					Carro atual = this.carros.get(i++);
+					if (atual instanceof VagaoGraneleiro) {
+						if ( (-1)*debito <= ((VagaoGraneleiro)atual).getCapacidade()) {
+							if (((VagaoGraneleiro)atual).carregarCarga((-1)*debito)) {
+								vagoes.add((VagaoGraneleiro)atual);
+								debito =0;
+							}
+						} else {
+							if (((VagaoGraneleiro)atual).carregarCarga(((VagaoGraneleiro)atual).getCapacidade())) {
+								vagoes.add((VagaoGraneleiro)atual);
+								debito += ((VagaoGraneleiro)atual).getCapacidade();
+							}
+						}
+					}
+				}
+			} else {
+				/*
+				 * caso nao haja espaco no trem todo, nao faz o carregamento
+				 */
+				return null;
+			}
+		}
+		/*
+		 * Conversao da ArrayList para o vetor que é pedido no retorno
+		 */
+		int i=0;
+		Vagao retorno[] = new Vagao[vagoes.size()];
+		for (VagaoGraneleiro vagao : vagoes) {
+			retorno[i++] = (Vagao) vagao;
+		}
+		return retorno;
+	}
+	/**
+	 * A Funcao carregarLiquido tenta colocar a quantidade de liquido em apenas 1 vagao 
+	 * da composicao, se falhar ela tenta distribuir essa quantidade nos vagoes, 
+	 * caso nao haja capacidade para o liquido na composicao a funao nao carrega os liquidos
+	 * @param quantidade
+	 * @param conteudo
+	 * @return Vagao[] vetor de vagoes que sofreram carregamento
+	 */
+	public Vagao[] carregarLiquido(int quantidade, ConteudoLiquido conteudo) {	
+		ArrayList<VagaoLiquidos> vagoes = new ArrayList<VagaoLiquidos>();
+		
+		/*
+		 * tenta carregar a quantidade do conteudo em apenas um vagao
+		 */
+		for (Carro carro : this.carros) {
+			if (carro instanceof VagaoLiquidos) {
+				if ( ((VagaoLiquidos) carro).aceitaConteudo(conteudo)) {
+					if (((VagaoLiquidos) carro).carregarCarga(quantidade)) {
+						vagoes.add((VagaoLiquidos)carro);
+						((VagaoLiquidos)carro).setConteudoUsado(conteudo);
+						break;
+					}
+				}
+			}
+		}
+		/*
+		 * conta a quantidade total de capacidade (soma)
+		 * na composicao
+		 */
+		int capacidadeVazios = 0;
+		for (Carro carro : this.carros) {
+			if (carro instanceof VagaoLiquidos) {
+				if (!((VagaoLiquidos) carro).carregado()) {
+					capacidadeVazios += ((VagaoLiquidos) carro).getCapacidade();
+				}
+			}
+		}
+		/*
+		 * caso nao conseguiu colocar em apenas um vagao tenta distribuir
+		 */
+		if (vagoes.isEmpty()) {
+			int debito = -quantidade;
+			int i=0;
+			if (capacidadeVazios >= quantidade) {
+				/*
+				 * distribui a quantidade sequencialmente nos vagoes
+				 */
+				while (debito < 0) {
+					Carro atual = this.carros.get(i++);
+					if (atual instanceof VagaoLiquidos) {
+						if ( (-1)*debito <= ((VagaoLiquidos)atual).getCapacidade()) {
+							if ( ((VagaoLiquidos) atual).aceitaConteudo(conteudo)) {
+								if (((VagaoLiquidos)atual).carregarCarga((-1)*debito)) {
+									vagoes.add((VagaoLiquidos)atual);
+									((VagaoLiquidos)atual).setConteudoUsado(conteudo);
+									debito =0;
+								}
+							}
+						} else {
+							if ( ((VagaoLiquidos) atual).aceitaConteudo(conteudo)) {
+								if (((VagaoLiquidos)atual).carregarCarga(((VagaoLiquidos)atual).getCapacidade())) {
+									vagoes.add((VagaoLiquidos)atual);
+									((VagaoLiquidos)atual).setConteudoUsado(conteudo);
+									debito += ((VagaoLiquidos)atual).getCapacidade();
+								}
+							}
+						}
+					}
+					
+				}
+			} else {
+				/*
+				 * caso nao houve capacidade total para armazenar aquela quantidade
+				 */
+				return null;
+			}
+		}
+		/*
+		 * conversao de ArrayList para o vetor de retorno
+		 */
+		int i=0;
+		Vagao retorno[] = new Vagao[vagoes.size()];
+		for (VagaoLiquidos vagao : vagoes) {
+			retorno[i++] = (Vagao) vagao;
+		}
+		return retorno;
+	}
+	
+	/**
+	 * Remove o carro indicado.
+	 */
+	public void removeCarro(Carro carro) {
+		this.carros.remove(carro);
 	}
 }

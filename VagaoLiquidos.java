@@ -1,19 +1,30 @@
 
+import java.util.ArrayList;
+
 /**
  * Classe que representa um vagão para carregar líquidos.
  */
 public class VagaoLiquidos extends Vagao {
 	
+	
+	/**
+	 * Representa conteúdo sendo usado atualmente.
+	 */
+	private ConteudoLiquido conteudo;
+	/**
+	 * ArrayList que representa os conteudos que o vagao aceita
+	 */
+	private ArrayList<ConteudoLiquido> conteudos;
 	/**
 	 * Variável usada para representar a capacidade do vagão
 	 */
 	private int capacidade;
-	private ConteudoLiquido[] conteudos;
-	
 	/**
-	 * Construtor que chama o contrutor da superclasse para setar alguns atributos, 
-	 * seta alguns atributos locais, e toma uma série de parametros
-	 * para registrar em um atributo do tipo vetor
+	 * Usada para representar a quantidade de carga que esta sendo usada atualmente
+	 */
+	private int cargaAtual;
+	/**
+	 * Inicializa as variaveis internas da classe e da superclasse
 	 * @param codigo
 	 * @param capacidade
 	 * @param conteudos
@@ -21,11 +32,15 @@ public class VagaoLiquidos extends Vagao {
 	public VagaoLiquidos(String codigo, int capacidade, ConteudoLiquido... conteudos) {
 		super(codigo);
 		this.capacidade = capacidade;
-		this.conteudos = conteudos;
+		this.conteudos = new ArrayList<ConteudoLiquido>();
+		for (ConteudoLiquido conteudo : conteudos) {
+			this.conteudos.add(conteudo);
+		}
+		this.conteudo = this.conteudos.get(0);
+		this.cargaAtual = 0;
 	}
 	/**
-	 * Método que retorna a capacidade liquida do vagao
-	 * @return int capacidade do vagao
+	 * metodo get para a capacidade do vagao
 	 */
 	public int getCapacidade() {
 		return this.capacidade;
@@ -41,33 +56,75 @@ public class VagaoLiquidos extends Vagao {
 			retorno += "I";
 		else
 			retorno += "N";
-		return retorno + "|" + getCapacidade();
+		return retorno + "|" + getCapacidade() + "|" + ConteudoLiquido.stringFormat(conteudo) + "|" + quantidadeCarregada();
 	}
+	
 	/**
-	 * Returna uma representação em string dos conteudos aceitos, que segue o formato
-	 * '|conteudo1|conteudo2|coteudo3|...|conteudon|'
-	 * @return String no formato especificado
+	 * Retorna uma representação em string de todos os conteudos que este vagao pode aceitar
+	 * @return
 	 */
 	private String conteudosAceitos() {
-		String output = "";
-		for (ConteudoLiquido conteudo : conteudos) {
-			output += "|" + ConteudoLiquido.stringFormat(conteudo);
+		String output = "|";
+		for (ConteudoLiquido conteudo : this.conteudos) {
+			output += ConteudoLiquido.stringFormat(conteudo) + "|";
 		}
-		output += "|";
 		return output;
 	}
+
 	/**
-	 * Avalia se ha algun conteudo inflamavel nos conteudos liquidos do vagao
-	 * @return boolean true se ha conteudo inflamavel
+	 * retorna se o conteudo que esta sendo guardado atualmente eh inflamavel
+	 * @return
 	 */
 	public boolean inflamavel() {
-		for (ConteudoLiquido conteudo : conteudos) {
-			if (ConteudoLiquido.inflamavel(conteudo)) {
+		if (ConteudoLiquido.inflamavel(this.conteudo)) {
+			return true;
+		}
+		return false;
+	}
+
+	@Override
+	public boolean carregarCarga(int quantidade) {
+		if (this.carregado()) {
+			return false;
+		} 
+		if (this.getCapacidade() < quantidade) {
+			return false;
+		}
+		this.cargaAtual += quantidade;
+		return true;
+		
+	}
+
+	@Override
+	public boolean carregado() {
+		if (this.quantidadeCarregada() > 0)
+			return true;
+		return false;
+	}
+
+	@Override
+	public int quantidadeCarregada() {
+		return this.cargaAtual;
+	}
+	/**
+	 * altera o conteudo atual do vagao
+	 * @param conteudo
+	 */
+	public void setConteudoUsado(ConteudoLiquido conteudo) {
+		this.conteudo = conteudo;
+	}
+
+	/**
+	 * verifica se o vagao pode aceitar o conteudo dado no parametro
+	 * @param conteudo
+	 * @return
+	 */
+	public boolean aceitaConteudo(ConteudoLiquido conteudo) {
+		for (ConteudoLiquido conteudoPossivel : conteudos) {
+			if (conteudoPossivel == conteudo) {
 				return true;
 			}
 		}
 		return false;
 	}
-	
-
 }
